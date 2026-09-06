@@ -8,14 +8,21 @@
                         <!-- When the screen is wider than md, float the portrait on the right -->
                         <div class="figure d-none d-md-block">
                             <img 
-                                src="{{ site.data.profile.portrait_url | relative_url }}" 
-                                class="figure-img img-fluid" 
+                                src="{{ site.data.profile.portrait_url | relative_url }}"
+                                data-original="{{ site.data.profile.portrait_url | relative_url }}"
+                                data-ai="{{ site.data.profile.portrait_ai_url | relative_url }}" 
+                                class="figure-img img-fluid diffusion-portrait" 
                                 data-toggle="tooltip" 
                                 data-placement="top" 
                                 title="{{ site.data.profile.portrait_caption }}">
                         </div>
                         <div class="mb-3 d-md-none text-center">
-                            <img src="{{ site.data.profile.portrait_url | relative_url }}" class="rounded-circle" style="max-width: 50%;" alt="Portrait">
+                            <img src="{{ site.data.profile.portrait_url | relative_url }}" class="rounded-circle diffusion-portrait" data-original="{{ site.data.profile.portrait_url | relative_url }}" data-ai="{{ site.data.profile.portrait_ai_url | relative_url }}"style="max-width: 50%;" alt="Portrait">
+                        </div>
+
+                        <div class="diffusion-control text-center">
+                            <button type="button" id="diffuse-button" aria-pressed="false">
+                            </button>
                         </div>
                         {% endif %}
                     </div>
@@ -117,3 +124,294 @@
     </div>
 </div>
 {% endif %}
+
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const button = document.getElementById("diffuse-button");
+    const portraits = [
+        ...document.querySelectorAll(".diffusion-portrait")
+    ];
+
+    if (!button || !portraits.length) return;
+
+    const progress = document.createElement("progress");
+    progress.max = 1;
+    progress.value = 0;
+    progress.hidden = true;
+    progress.className = "diffusion-progress";
+    progress.setAttribute("aria-label", "Portrait transition");
+    button.before(progress);
+
+    let showingAI = false;
+    let running = false;
+    let skipAnimation = null;
+
+    async function loadImage(url) {
+        if (!url) throw new Error("Missing portrait URL");
+
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        return image;
+    }
+
+    // Match object-fit: cover without stretching the image.
+    function drawCover(ctx, image, width, height) {
+        const scale = Math.max(
+            width / image.naturalWidth,
+            height / image.naturalHeight
+        );
+
+        const drawnWidth = image.naturalWidth * scale;
+        const drawnHeight = image.naturalHeight * scale;
+
+        ctx.drawImage(
+            image,
+            (width - drawnWidth) / 2,
+            (height - drawnHeight) / 2,
+            drawnWidth,
+            drawnHeight
+        );
+    }
+
+    // Add overlays without changing your responsive HTML classes.
+    const layers = portraits.map(portrait => {
+        const parent = portrait.parentElement;
+
+        if (getComputedStyle(parent).position === "static") {
+            parent.style.position = "relative";
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.hidden = true;
+        canvas.setAttribute("aria-hidden", "true");
+
+        Object.assign(canvas.style, {
+            position: "absolute",
+            pointerEvents: "none",
+            zIndex: "1"
+        });
+
+        parent.appendChild(canvas);
+
+        return {
+            portrait,
+            canvas,
+            ctx: canvas.getContext("2d")
+        };
+    });
+
+    function positionLayer(layer) {
+        const { portrait, canvas } = layer;
+        const width = portrait.offsetWidth;
+        const height = portrait.offsetHeight;
+
+        if (!width || !height) return false;
+
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        const pixelWidth = Math.round(width * ratio);
+        const pixelHeight = Math.round(height * ratio);
+
+        if (
+            canvas.width !== pixelWidth ||
+            canvas.height !== pixelHeight
+        ) {
+            canvas.width = pixelWidth;
+            canvas.height = pixelHeight;
+        }
+
+        Object.assign(canvas.style, {
+            left: portrait.offsetLeft + "px",
+            top: portrait.offsetTop + "px",
+            width: width + "px",
+            height: height + "px",
+            borderRadius: getComputedStyle(portrait).borderRadius
+        });
+
+        return true;
+    }
+
+    const noiseCanvas = document.createElement("canvas");
+    noiseCanvas.width = 160;
+    noiseCanvas.height = 160;
+
+    const noiseCtx = noiseCanvas.getContext("2d");
+    const noise = noiseCtx.createImageData(160, 160);
+
+    function generateNoise() {
+        for (let i = 0; i < noise.data.length; i += 4) {
+            noise.data[i] = Math.random() * 256;
+            noise.data[i + 1] = Math.random() * 256;
+            noise.data[i + 2] = Math.random() * 256;
+            noise.data[i + 3] = 255;
+        }
+
+        noiseCtx.putImageData(noise, 0, 0);
+    }
+
+    function paint(image, noiseOpacity) {
+        layers.forEach(layer => {
+            if (!positionLayer(layer)) return;
+
+            const { canvas, ctx } = layer;
+            const { width, height } = canvas;
+
+            ctx.globalAlpha = 1;
+            ctx.clearRect(0, 0, width, height);
+            ctx.imageSmoothingEnabled = true;
+            drawCover(ctx, image, width, height);
+
+            if (noiseOpacity > 0) {
+                ctx.globalAlpha = noiseOpacity;
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(noiseCanvas, 0, 0, width, height);
+            }
+
+            ctx.globalAlpha = 1;
+            canvas.hidden = false;
+        });
+    }
+
+    button.disabled = true;
+
+    let original;
+    let ai;
+
+    try {
+        [original, ai] = await Promise.all([
+            loadImage(portraits[0].dataset.original),
+            loadImage(portraits[0].dataset.ai)
+        ]);
+    } catch (error) {
+        button.textContent = "Image unavailable";
+        return;
+    }
+
+    button.disabled = false;
+    button.textContent = "✨ diffuse";
+
+    button.addEventListener("click", function () {
+        if (running) {
+            if (skipAnimation) skipAnimation();
+            return;
+        }
+
+        running = true;
+
+        const targetAI = !showingAI;
+        const source = showingAI ? ai : original;
+        const target = targetAI ? ai : original;
+
+        const duration = 3600;
+        let start = null;
+        let frame = null;
+        let finishing = false;
+
+        button.textContent = "skip";
+        button.setAttribute("aria-busy", "true");
+        progress.value = 0;
+        progress.hidden = false;
+
+        async function finish() {
+            if (finishing) return;
+
+            finishing = true;
+            skipAnimation = null;
+            cancelAnimationFrame(frame);
+            button.disabled = true;
+
+            // Keep the final image visible while each <img> updates.
+            paint(target, 0);
+            progress.value = 1;
+
+            await Promise.all(layers.map(async layer => {
+                const { portrait } = layer;
+
+                portrait.src = targetAI
+                    ? portrait.dataset.ai
+                    : portrait.dataset.original;
+
+                portrait.alt = targetAI
+                    ? "AI illustration of Roberto"
+                    : "Photograph of Roberto";
+
+                try {
+                    await portrait.decode();
+                    return true;
+                } catch (error) {
+                    // Leave the canvas visible if decoding fails.
+                    return false;
+                }
+            })).then(decoded => {
+                // Allow the decoded images to reach the next paint.
+                requestAnimationFrame(() => {
+                    layers.forEach((layer, index) => {
+                        if (decoded[index]) {
+                            layer.canvas.hidden = true;
+                        }
+                    });
+
+                    showingAI = targetAI;
+                    running = false;
+                    progress.hidden = true;
+                    button.disabled = false;
+                    button.textContent = showingAI
+                        ? "✨ diffuse back"
+                        : "✨ diffuse";
+
+                    button.setAttribute(
+                        "aria-pressed",
+                        String(showingAI)
+                    );
+
+                    button.removeAttribute("aria-busy");
+                });
+            });
+        }
+
+        skipAnimation = finish;
+
+        if (
+            window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches
+        ) {
+            finish();
+            return;
+        }
+
+        // Paint the original frame before beginning the noise.
+        paint(source, 0);
+
+        function animate(now) {
+            if (finishing) return;
+            if (start === null) start = now;
+
+            const t = Math.min((now - start) / duration, 1);
+
+            if (t >= 1) {
+                finish();
+                return;
+            }
+
+            // Fade into noise, then reveal the other portrait.
+            const amount = Math.min(
+                1,
+                t < 0.5 ? t / 0.5 : (1 - t) / 0.5
+            );
+
+            const noiseOpacity =
+                amount * amount * (3 - 2 * amount);
+
+            generateNoise();
+            paint(t < 0.5 ? source : target, noiseOpacity);
+
+            progress.value = t;
+            frame = requestAnimationFrame(animate);
+        }
+
+        frame = requestAnimationFrame(animate);
+    });
+});
+</script>

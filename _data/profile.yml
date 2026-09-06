@@ -8,7 +8,7 @@ positions:
   logo: /assets/images/badges/purdue-motion-p.svg  # Logo is optional
 
 
-email: "rhogasgo@purdue.edu"
+email: "rhogasgo@purdue(dot)edu"
 cv_link: https://rhogas.github.io/assets/pdfs/dsi_symposium_sp26_lumens_pv.pdf
 gscholar: xFmQpf4AAAAJ  # This is an example, replace it with your own Google Scholar ID
 github: rhogas
@@ -23,13 +23,15 @@ short_bio_text_justify: false
 short_bio: >-
   Welcome! I’m Roberto, a final-year undergraduate student at <a href="https://purdue.edu" target="_blank">Purdue University</a>, on exchange from <a href="https://www.uc3m.es/home" target="_blank">University Carlos III of Madrid</a>.
   <p><p>
-  My main research interests lie in the intersection of optimisation and machine learning techniques, with applications including decision-making under uncertainty and the design, verification and analysis of complex systems that can be abstracted as networks. Other topics of interest are theorical optimization of decision trees and graph query algorithms to improve modelization of large-scale decision problems.</p> 
+  My main research interests lie in the intersection of optimisation and machine learning techniques, with applications including decision-making under uncertainty and the design, verification and analysis of complex systems that can be abstracted as networks. Other topics of interest are theorical optimization of decision trees and graph algorithms to improve modelization of large-scale decision problems.</p> 
 
   My past work involves the use of finite element methods, mixed-dimensional modelling and deep learning approaches, including physics-informed neural networks and neural operators, to accelerate physical flow simulations. I have also explored topics in numerical analysis, including the use of Faber polynomials to accelerate the convergence of the power iteration method for matrices whose eigenvalues ​​lie in certain regions of the complex plane.
   <p><p>
-  When I am not doing research, I enjoy reading about political history and visiting new places around the world.
+  When I am not doing research, I enjoy reading about Spanish and U.S. history and visiting new places around the world.
 
-portrait_url: /assets/images/photos/portrait.jpeg
+portrait_url: /assets/images/photos/portrait_roberto.png
+portrait_ai_url: /assets/images/photos/portrait_roberto_ai.png
+
 portrait_caption: >-
   Photo by SAETA UC3M
 
@@ -40,7 +42,7 @@ education:
     Exchange Student in Mathematics and Computer Science
   date: Aug. 2026 - May. 2027
 - name: University of Florida
-  logo: /assets/images/badges/UF_circle.png
+  logo: /assets/images/badges/UF_circle.svg
   position: >- 
     Exchange Student, Mathematics and Computer Science
   date: Aug. 2025 - Aug. 2026
@@ -51,7 +53,7 @@ education:
 
 experience:
  - name: University of Florida
-   logo: /assets/images/badges/UF_circle.png
+   logo: /assets/images/badges/UF_circle.svg
    position: "Undergraduate Research Assistant<br><em>Advisor: Dr. Zhe Jiang</em>"
    date: May. 2026 - Aug. 2026
 

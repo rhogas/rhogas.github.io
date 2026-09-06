@@ -9,10 +9,36 @@
             <ul class="navbar-nav ml-auto">
                 {% for item in site.data.navigation.pages %}
                 <li class="nav-item {% if item.name == page.navbar_title or include.active_page == item.name %}active{% endif %}">
-                    <a class="nav-link" href="{{ item.url | relative_url }}">{{ item.name }}</a>
+                    <a class="nav-link" href="{{ item.url | relative_url }}" {% if item.new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}> {{ item.name }}</a>
                 </li>
                 {% endfor %}
             </ul>
+            <button id="theme-toggle" class="btn theme-toggle ml-2" type="button" title="Toggle dark mode" aria-label="Toggle dark mode"> <i class="fas fa-moon"></i></button>
         </div>
     </div>
 </nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const root = document.documentElement;
+    const button = document.getElementById("theme-toggle");
+    const icon = button.querySelector("i");
+
+    function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+        button.setAttribute("aria-pressed", theme === "dark");
+    }
+
+    const currentTheme =
+    document.documentElement.getAttribute("data-theme");
+
+    applyTheme(currentTheme);
+
+    button.addEventListener("click", function () {
+        const nextTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        localStorage.setItem("theme", nextTheme);
+        applyTheme(nextTheme);
+    });
+});
+</script>
