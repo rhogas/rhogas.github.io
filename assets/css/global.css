@@ -3,7 +3,26 @@ body {
     font-family: "Lato", sans-serif;
     font-weight: 400;
     padding-top: 5.0rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
+
+html,
+body {
+    min-height: 100%;
+}
+
+
+.site-content {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+.footer {
+    flex-shrink: 0;
+}
+
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -118,6 +137,21 @@ body,
 }
 
 /* Dark mode */
+
+html[data-theme="dark"] .text-dark,
+html[data-theme="dark"] .card-title,
+html[data-theme="dark"] .card-title a,
+html[data-theme="dark"] .card-header,
+html[data-theme="dark"] .card-body,
+html[data-theme="dark"] .card-body h1,
+html[data-theme="dark"] .card-body h2,
+html[data-theme="dark"] .card-body h3,
+html[data-theme="dark"] .card-body h4,
+html[data-theme="dark"] .card-body h5,
+html[data-theme="dark"] .card-body h6 {
+    color: #e8edf3 !important;
+}
+
 html[data-theme="dark"] body {
   color: #e8edf3;
   background-color: #10151c !important;
@@ -225,3 +259,10 @@ html[data-theme="dark"] .theme-toggle {
     }
 }
 
+html[data-theme="dark"] .text-body {
+    color: #cbd5df !important;
+}
+
+html[data-theme="dark"] a.text-body:hover {
+    color: #62a8ff !important;
+}

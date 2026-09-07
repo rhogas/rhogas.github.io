@@ -9,7 +9,7 @@ positions:
 
 
 email: "rhogasgo@purdue(dot)edu"
-cv_link: https://rhogas.github.io/assets/pdfs/dsi_symposium_sp26_lumens_pv.pdf
+cv_link: https://rhogas.github.io/assets/pdfs/cv_roberto_hogas_goras.pdf
 gscholar: xFmQpf4AAAAJ  # This is an example, replace it with your own Google Scholar ID
 github: rhogas
 #twitter: your_twitter_id  # Do not include the '@' symbol
@@ -25,9 +25,9 @@ short_bio: >-
   <p><p>
   My main research interests lie in the intersection of optimisation and machine learning techniques, with applications including decision-making under uncertainty and the design, verification and analysis of complex systems that can be abstracted as networks. Other topics of interest are theorical optimization of decision trees and graph algorithms to improve modelization of large-scale decision problems.</p> 
 
-  My past work involves the use of finite element methods, mixed-dimensional modelling and deep learning approaches, including physics-informed neural networks and neural operators, to accelerate physical flow simulations. I have also explored topics in numerical analysis, including the use of Faber polynomials to accelerate the convergence of the power iteration method for matrices whose eigenvalues ​​lie in certain regions of the complex plane.
+  My past work involves the use of finite element methods and deep learning approaches, including physics-informed neural networks and neural operators, to accelerate physical flow simulations. I have also explored topics in numerical analysis, including the use of Faber polynomials to accelerate the convergence of the power iteration method for matrices whose eigenvalues ​​lie in certain regions of the complex plane.
   <p><p>
-  When I am not doing research, I enjoy reading about Spanish and U.S. history and visiting new places around the world.
+  When I am not doing research, I enjoy reading about history and visiting new places around the world.
 
 portrait_url: /assets/images/photos/portrait_roberto.png
 portrait_ai_url: /assets/images/photos/portrait_roberto_ai.png

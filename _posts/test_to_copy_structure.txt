@@ -1,7 +1,7 @@
 ---
 layout: blog_post
 title: 'This is the title of the blog post'
-date: 2025-01-01
+date: 2026-04-24
 tags:
   - Blog
   - Post
