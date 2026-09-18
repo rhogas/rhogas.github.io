@@ -8,11 +8,15 @@ body {
     flex-direction: column;
 }
 
-html,
-body {
-    min-height: 100%;
+html {
+    height: 100%;
 }
 
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
 .site-content {
     flex: 1 0 auto;
